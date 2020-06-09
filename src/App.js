@@ -20,27 +20,35 @@ class App extends React.Component {
   };
 
   editClickHandler = (id) => {
-    this.setState({
-      isEditing: true,
-      showForm: true,
-      editContactID: id,
-    });
+    this.setState(
+      {
+        isEditing: true,
+        showForm: false,
+        editContactID: id,
+      },
+      () =>
+        this.setState({
+          showForm: true,
+        })
+    );
   };
   addContact = (contact) => {
     let newContact = { id: `${Math.random()}`, ...contact };
     this.setState({ contacts: [newContact, ...this.state.contacts] });
   };
   // making the assumption that the param updatedContactInfo =>{name,phone}
-  editContact = (id, updatedContactInfo) => {
+  editContact = (updatedContactInfo) => {
     const editedContacts = this.state.contacts.map((c) => {
-      if (c.id !== id) return c;
+      if (c.id !== this.state.editContactID) return c;
       console.log(c);
       console.log(updatedContactInfo);
+      console.log({ ...c, ...updatedContactInfo });
       return { ...c, ...updatedContactInfo };
     });
 
     this.setState({
       contacts: editedContacts,
+      isEditing: false,
     });
   };
   deleteContact = (id) => {
@@ -51,12 +59,12 @@ class App extends React.Component {
   };
   getContact = () => {
     const { contacts, editContactID } = this.state;
-    return contacts.find((c) => (c.id = editContactID));
+    return contacts.find((c) => c.id === editContactID);
   };
   render() {
     const { showForm, contacts, isEditing } = this.state;
-    const contact = this.state.isEditing ? this.getContact() : null;
-
+    const contact = isEditing ? this.getContact() : null;
+    console.log(contact);
     return (
       <Container style={{ paddingTop: "20px" }}>
         <Header as="h1">React Contact List</Header>
