@@ -12,22 +12,51 @@ class App extends React.Component {
       { id: 3, name: "George", phone: "10" },
     ],
     showForm: true,
+    isEditing: false,
+    editContactID: null,
   };
   toggleForm = () => {
     this.setState({ showForm: !this.state.showForm });
+  };
+
+  editClickHandler = (id) => {
+    this.setState({
+      isEditing: true,
+      showForm: true,
+      editContactID: id,
+    });
   };
   addContact = (contact) => {
     let newContact = { id: `${Math.random()}`, ...contact };
     this.setState({ contacts: [newContact, ...this.state.contacts] });
   };
+  // making the assumption that the param updatedContactInfo =>{name,phone}
+  editContact = (id, updatedContactInfo) => {
+    const editedContacts = this.state.contacts.map((c) => {
+      if (c.id !== id) return c;
+      console.log(c);
+      console.log(updatedContactInfo);
+      return { ...c, ...updatedContactInfo };
+    });
+
+    this.setState({
+      contacts: editedContacts,
+    });
+  };
   deleteContact = (id) => {
     const contacts = this.state.contacts.filter((c) => c.id !== id);
     this.setState({
-      contacts: contacts,
+      contacts,
     });
   };
+  getContact = () => {
+    const { contacts, editContactID } = this.state;
+    return contacts.find((c) => (c.id = editContactID));
+  };
   render() {
-    const { showForm, contacts } = this.state;
+    const { showForm, contacts, isEditing } = this.state;
+    const contact = this.state.isEditing ? this.getContact() : null;
+
     return (
       <Container style={{ paddingTop: "20px" }}>
         <Header as="h1">React Contact List</Header>
@@ -35,9 +64,21 @@ class App extends React.Component {
           <Button icon color="blue" onClick={this.toggleForm}>
             <Icon name={showForm ? "angle double up" : "angle double down"} />
           </Button>
-          {showForm && <ContactForm add={this.addContact} />}
+          {showForm && (
+            <ContactForm
+              contact={contact}
+              getContact={this.getContact}
+              isEditing={isEditing}
+              edit={this.editContact}
+              add={this.addContact}
+            />
+          )}
         </Segment>
-        <Contacts remove={this.deleteContact} contacts={contacts} />
+        <Contacts
+          remove={this.deleteContact}
+          editClicked={this.editClickHandler}
+          contacts={contacts}
+        />
       </Container>
     );
   }

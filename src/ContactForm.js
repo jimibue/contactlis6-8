@@ -2,14 +2,22 @@ import React from "react";
 import { Form } from "semantic-ui-react";
 
 export default class ContactForm extends React.Component {
-  state = { name: "", phone: "" };
+  state = {
+    name: this.props.contact ? this.props.contact.name : "",
+    phone: this.props.contact ? this.props.contact.phone : "",
+  };
 
   handleSubmit = (e) => {
     e.preventDefault();
     console.log(this.state); // as the new contact
     // we add new contact to state, where do we do that?
     // need to add this to app state
-    this.props.add(this.state);
+    if (this.props.isEditing) {
+      this.props.edit(this.state);
+    } else {
+      this.props.add(this.state);
+    }
+
     this.setState({
       name: "",
       phone: "",
